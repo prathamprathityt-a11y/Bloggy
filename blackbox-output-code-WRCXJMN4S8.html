@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloggy - Write Stories Instantly</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --win11-blue: #0078D4;
+            --win11-gray: #F3F3F3;
+            --win11-dark: #202020;
+            --ios-white: #FFFFFF;
+            --accent-blue: #3B82F6;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+            --warning-yellow: #F59E0B;
+            --purple: #8B5CF6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Floating Header */
+        .header {
+            position: sticky;
+            top: 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--accent-blue), var(--purple), #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-blue), var(--purple));
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        /* Posts Section */
+        .posts-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, white, #E5E7EB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .posts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .post-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--purple));
+        }
+
+        .post-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1F2937;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .post-content {
+            color: #4B5563;
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6B7280;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            color: #6B7280;
+        }
+
+        /* Editor Sidebar */
+        .editor-section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.3);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .editor-title {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--accent-blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #374151;
+            font-size: 15px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 20px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .editor-textarea {
+            min-height: 300px;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .status.success {
+            background: linear-gradient(45deg, #D1FAE5, #A7F3D0);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .status.error {
+            background: linear-gradient(45deg, #FEE2E2, #FECACA);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .editor-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .posts-section, .editor-section {
+                padding: 25px;
+                border-radius: 20px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post-card {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .post-card:nth-child(odd) { animation-delay: 0.1s; }
+        .post-card:nth-child(even) { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Floating Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-feather-alt"></i>
+                Bloggy
+            </div>
+            <div class="header-buttons">
+                <a href="#posts" class="btn btn-secondary">
+                    <i class="fas fa-eye"></i> Browse Stories
+                </a>
+                <button class="btn btn-primary" onclick="clearEditor()">
+                    <i class="fas fa-magic"></i> AI Suggest
+                </button>
+                <button class="btn btn-primary" onclick="publishPost()">
+                    <i class="fas fa-rocket"></i> Publish Now
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Posts Section -->
+            <div class="posts-section">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open"></i>
+                    Latest Stories
+                </h2>
+                <div id="postsGrid" class="posts-grid">
+                    <div class="empty-state" id="emptyState">
+                        <i class="fas fa-sparkles"></i>
+                        <h3>✨ Be the first to share!</h3>
+                        <p>Use the editor on the right to write your first story</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instant Editor -->
+            <div class="editor-section">
+                <h2 class="editor-title">
+                    <i class="fas fa-edit"></i>
+                    Write Your Story
+                </h2>
+                
+                <div id="publishStatus"></div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Title</label>
+                    <input type="text" id="postTitle" placeholder="What's your story about?">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-pen-fancy"></i> Your Story</label>
+                    <textarea class="editor-textarea" id="postContent" 
+                        placeholder="Start writing your story, blog, article, or personal experience here... 
+No limits, no rules - just pure creativity! ✨"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="publishPost()">
+                        <i class="fas fa-paper-plane"></i> Publish Instantly
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="clearEditor()">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 20px; background: #F8FAFC; border-radius: 15px; font-size: 14px; color: #64748B;">
+                    <strong>💡 Pro Tip:</strong> Write at least 100 characters to publish. 
+                    Your story appears instantly for everyone to read!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Local Storage as Database
+        const STORAGE_KEY = 'bloggy_posts';
+        let posts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        // Auto-save editor content
+        const titleInput = document.getElementById('postTitle');
+        const contentInput = document.getElementById('postContent');
+
+        // Load saved draft
+        window.addEventListener('load', () => {
+            const draft = JSON.parse(localStorage.getItem('bloggy_draft') || '{}');
+            titleInput.value = draft.title || '';
+            contentInput.value = draft.content || '';
+            renderPosts();
+        });
+
+        // Auto-save every 2 seconds
+        setInterval(() => {
+            localStorage.setItem('bloggy_draft', JSON.stringify({
+                title: titleInput.value,
+                content: contentInput.value,
+                timestamp: Date.now()
+            }));
+        }, 2000);
+
+        titleInput.addEventListener('input', () => {
+            renderWordCount();
+        });
+
+        contentInput.addEventListener('input', () => {
+            renderWordCount();
+        });
+
+        function renderWordCount() {
+            const text = contentInput.value;
+            const words = text.trim().split(/\s+/).length;
+            const chars = text.length;
+            // You can add word count display here if needed
+        }
+
+        function publishPost() {
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+
+            if (!title || !content) {
+                showStatus('publishStatus', 'error', '📝 Please add a title and some content!');
+                return;
+            }
+
+            if (content.length < 50) {
+                showStatus('publishStatus', 'error', '✍️ Story needs at least 50 characters to publish!');
+                return;
+            }
+
+            // Simple content moderation
+            const badWords = ['spam', 'buy', 'click', 'scam']; // Add more as needed
+            const hasBadContent = badWords.some(word => 
+                content.toLowerCase().includes(word) || 
+                title.toLowerCase().includes(word)
+            );
+
+            if (hasBadContent) {
+                showStatus('publishStatus', 'error', '🚫 Please avoid spam/promotional content');
+                return;
+            }
+
+            // Create new post
+            const newPost = {
+                id: Date.now().toString(),
+                title,
+                content,
+                author: title.substring(0, 15) + '...', // Use title as author
+                timestamp: Date.now(),
+                views: 0,
+                likes: 0
+            };
+
+            posts.unshift(newPost); // Add to top
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+
+            // Clear editor
+            clearEditor();
+
+            // Show success
+            showStatus('publishStatus', 'success', 
+                '🎉 Story published instantly! Everyone can now read it! ✨');
+
+            // Refresh posts
+            renderPosts();
+
+            // Scroll to top post
+            setTimeout(() => {
+                document.querySelector('.post-card')?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }, 500);
+        }
+
+        function clearEditor() {
+            titleInput.value = '';
+            contentInput.value = '';
+            localStorage.removeItem('bloggy_draft');
+            document.getElementById('publishStatus').innerHTML = '';
+            titleInput.focus();
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (posts.length === 0) {
+                container.innerHTML = emptyState.outerHTML;
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = posts.map(post => createPostCard(post)).join('');
+
+            // Add click to expand (optional)
+            document.querySelectorAll('.post-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        function createPostCard(post) {
+            const timeAgo = getTimeAgo(post.timestamp);
+            return `
+                <div class="post-card" onclick="expandPost('${post.id}')">
+                    <h3 class="post-title">${post.title}</h3>
+                    <div class="post-content">${post.content.substring(0, 300)}${post.content.length > 300 ? '...' : ''}</div>
+                    <div class="post-meta">
+                        <div class="author-info">
+                            <i class="fas fa-user-circle" style="font-size: 24px; color: var(--accent-blue);"></i>
+                            <span>${post.author}</span>
+                        </div>
+                        <div class="stats">
+                            <span><i class="fas fa-eye"></i> ${post.views || 0}</span>
+                            <span><i class="fas fa-heart"></i> ${post.likes || 0}</span>
+                            <span><i class="fas fa-clock"></i> ${timeAgo}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function expandPost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                // Create modal or just alert full content
+                const fullContent = post.content.replace(/\n/g, '<br>');
+                const modal = `
+                    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;">
+                        <div style="background:white;max-width:800px;width:95%;max-height:90vh;overflow:auto;border-radius:20px;padding:40px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;">
+                                <h2 style="margin:0;font-size:2rem;color:#1F2937;">${post.title}</h2>
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;font-size:30px;cursor:pointer;">×</button>
+                            </div>
+                            <div style="line-height:1.8;color:#374151;font-size:17px;">${fullContent}</div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modal);
+            }
+        }
+
+        function showStatus(elementId, type, message) {
+            const status = document.getElementById(elementId);
+            status.className = `status ${type}`;
+            status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return new Date(timestamp).toLocaleDateString();
+        }
+
+        // AI Suggestion Feature
+        function suggestStory() {
+            const prompts = [
+                "A magical adventure in a hidden forest...",
+                "My most embarrassing moment that taught me a lesson...",
+                "What I learned from my biggest failure...",
+                "The day everything changed for me...",
+                "If I could time travel, I would...",
+                "The best day of my life was..."
+            ];
+            
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            contentInput.value = randomPrompt;
+            contentInput.focus();
+            showStatus('publishStatus', 'success', '✨ AI inspiration loaded! Keep writing...');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        publishPost();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        clearEditor();
+                        break;
+                }
+            }
+        });
+
+        // Welcome animation
+        setTimeout(() => {
+            titleInput.placeholder = 'Type your story title here... Hit Ctrl+Enter to publish instantly!';
+        }, 2000);
+    </script>
+</body>
+</html>
